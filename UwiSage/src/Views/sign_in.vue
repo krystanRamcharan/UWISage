@@ -14,7 +14,7 @@
         <button type="submit" class="submit-button">Sign Up</button>
         <p class="register-prompt">
           Don't have an account?
-          <a href="#" class="register-link">Register</a>
+          <a href="/sign_up" class="register-link">Register</a>
         </p>
       </form>
     </div>
