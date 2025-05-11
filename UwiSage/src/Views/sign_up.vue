@@ -267,26 +267,52 @@ export default {
     },
 
     async submitForm() {
-      this.isSubmitting = true
+      this.isSubmitting = true;
 
       if (!this.validateForm()) {
-        this.isSubmitting = false
-        return
+        this.isSubmitting = false;
+        return;
       }
 
       try {
-        // to eventually send data to the backend (TODO)
-        // const response = await apiService.register(this.form)
+        const response = await fetch('http://localhost:5000/api/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            uwiEmail: this.form.uwiEmail,
+            password: this.form.password,
+            username: this.form.username
+          })
+        });
 
-        // juss fi see seh it aguh send for now:
-        console.log('Form submitted successfully:', this.form)
+        const data = await response.json();
+
+        if (!response.ok) {
+          alert(data.error || 'Registration failed');
+          return;
+        }
+
+        alert(data.message || 'Registration successful');
+        console.log('User registered:', data);
+
+        this.form.uwiEmail = '';
+        this.form.password = '';
+        this.form.confirmPassword = '';
+        this.form.username = '';
+        this.errors = {};
+
+        this.$router.push('/sign_in');
 
       } catch (error) {
-        console.error('Registration failed:', error)
+        console.error('Registration failed:', error);
+        alert('An error occurred while registering. Please try again.');
       } finally {
-        this.isSubmitting = false
+        this.isSubmitting = false;
       }
     }
+
   }
 }
 

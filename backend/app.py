@@ -3,9 +3,13 @@ from flask_cors import CORS
 import mysql.connector
 from mysql.connector import Error
 from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+import datetime
 
 app = Flask(__name__)
 CORS(app)
+
+SECRET_KEY = "our_secret_key" #(TODO)
 
 def get_connection():
     return mysql.connector.connect(
@@ -44,8 +48,8 @@ def signup():
             cursor.close()
             conn.close()
 
-@app.route('/api/signin', methods=['POST'])
-def signin():
+@app.route('/api/login', methods=['POST'])
+def login():
     data = request.get_json()
     email = data['uwiEmail']
     password = data['password']
@@ -53,12 +57,20 @@ def signin():
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        query = "SELECT * FROM users WHERE uwi_email = %s"
-        cursor.execute(query, (email,))
+        cursor.execute("SELECT * FROM users WHERE uwi_email = %s", (email,))
         user = cursor.fetchone()
 
         if user and check_password_hash(user['password_hash'], password):
-            return jsonify({'message': 'Login successful', 'username': user['username']}), 200
+            token = jwt.encode(
+                {
+                    'user_id': user['id'],
+                    'username': user['username'],
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+                },
+                SECRET_KEY,
+                algorithm='HS256'
+            )
+            return jsonify({'token': token, 'username': user['username']}), 200
         else:
             return jsonify({'error': 'Invalid credentials'}), 401
     except Error as e:

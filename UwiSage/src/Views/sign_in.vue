@@ -31,12 +31,42 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
-      console.log('Form submitted', this.email, this.password)
+    async handleSubmit() {
+      try {
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uwiEmail: this.email,
+            password: this.password
+          })
+        });
+
+        const data = await response.json();
+        if (!data.token) {
+          alert('Invalid response from server.');
+          return;
+        }
+
+        if (!response.ok) {
+          alert(data.error || 'Login failed');
+          return;
+        }
+
+        localStorage.setItem('jwt_token', data.token);
+        localStorage.setItem('username', data.username);
+
+        this.$router.push('/chat');
+
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('An unexpected error occurred. Please try again.');
+      }
     }
   }
 }
 </script>
+
 
 <style scoped>
 .login-container {
