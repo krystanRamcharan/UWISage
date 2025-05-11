@@ -115,7 +115,6 @@ export default {
   flex-direction: column;
 }
 
-
 .header {
   width: 80%;
   padding: 28px 5%;
