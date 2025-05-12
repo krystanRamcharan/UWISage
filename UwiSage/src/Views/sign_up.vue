@@ -125,7 +125,7 @@
 
 .submit-button {
   width: 100%;
-  background-color: #333;
+  background-color: #3350cc;
   color: #f5f5f5;
   border-radius: 8px;
   padding: 0.75rem 0;
@@ -140,7 +140,7 @@
 }
 
 .sign-in-link {
-  color: #333;
+  color: #4467ff;
   text-decoration: none;
   margin-left: 0.5rem;
 }

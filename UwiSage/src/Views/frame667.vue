@@ -3,9 +3,9 @@
     <header class="header">
       <div class="logo" v-html="logoSvg"></div>
       <nav class="navigation">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#register" class="nav-link">Register</a>
-        <a href="#login" class="nav-link">Login</a>
+        <!-- <a href="#features" class="nav-link">Features</a>
+        <a href="#register" class="nav-link">Register</a> -->
+        <router-link to="/chat">Chat With Sage</router-link>
       </nav>
       <div class="auth-buttons">
         <router-link to="/sign_in">
@@ -28,9 +28,7 @@
         </div>
         <div class="hero-cta">
           <p class="hero-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-            interdum lacus in erat feugiat feugiat. Phasellus interdum varius
-            augue, pellentesque molestie ante.
+            From managing your study schedule to finding past papers, UWISage uses smart algorithms to help students stay on top of university life — with less stress.
           </p>
           <button class="cta-button">Get started</button>
         </div>
@@ -39,12 +37,9 @@
       <section class="how-to-use">
         <div class="how-to-use-content">
           <div class="section-header">
-            <h2 class="section-title">HOW TO USE SAGEUWI</h2>
+            <h2 class="section-title">Maximize Your Studying With UWISage</h2>
             <p class="section-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-              interdum lacus in erat feugiat feugiat. Phasellus interdum varius
-              augue, pellentesque molestie ante.
-            </p>
+              Built with powerful AI under the hood, UWISage is simple to use but smart enough to adapt to you.            </p>
           </div>
           <div class="divider"></div>
         </div>
@@ -57,12 +52,9 @@
 
       <section class="cta-section">
         <div class="cta-content">
-          <h2 class="cta-title">Maximize your study and learning with SAGEUWI</h2>
+          <h2 class="cta-title">Want To See UWISage In Action?</h2>
           <p class="cta-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
-            convallis pellentesque mollis. Donec a porttitor dui. Donec at varius
-            ex, eget volutpat nunc.
-          </p>
+            Register with us and try it out now or watch our demo!            </p>
           <div class="cta-actions">
             <button class="start-free-btn">Get started for free</button>
             <button class="watch-video-btn" v-html="videoIconSvg"></button>
@@ -116,7 +108,7 @@ export default {
 }
 
 .header {
-  width: 80%;
+  width: 90%;
   padding: 28px 5%;
   display: flex;
   justify-content: space-between;
@@ -151,6 +143,7 @@ export default {
   padding: 16px 40px;
   border-radius: 40px;
   border: 1px solid #2a2b3a;
+  box-shadow: 0px 0px 10px 0px #74f;
   color: #fff;
   font: 16px ABeeZee;
   background-color: transparent;
@@ -246,24 +239,37 @@ export default {
 
 .how-to-use {
   display: flex;
-  width: 80%;
-  padding: 100px;
-  justify-content: space-between;
+  flex-direction: column;
+  width: 90%;
+  max-width: 1000px;
+  padding: 40px 20px;
+  justify-content: center;
   align-items: center;
-  border-radius: 30px;
+  border-radius: 20px;
   border-top: 2px solid #4467ff;
   border-bottom: 2px solid #4467ff;
-  box-shadow: 0px 16px 80px 0px rgba(102, 77, 255, 0.1);
-  margin: 100px auto;
+  box-shadow: 0px 8px 40px rgba(102, 77, 255, 0.1);
+  margin: 60px auto;
   background-color: #010314;
+}
+
+.how-to-use-inner {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .how-to-use-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 34px;
+  width: 100%;
 }
+
 
 .section-header {
   display: flex;
@@ -285,7 +291,8 @@ export default {
 
 .section-description {
   width: 745px;
-  color: #77798f;
+  color: #ececf1;
+  text-align: center;
   font: 400 26px/160% ABeeZee;
 }
 
@@ -309,11 +316,11 @@ export default {
 }
 
 .chatbot-overlay {
-  width: 100%;
-  height: 100%;
+  width: 70;
+  height: 70%;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 60px;
 }
 
 .chatbot-color-overlay {
@@ -327,10 +334,13 @@ export default {
 }
 
 .cta-section {
-  width: 1260px;
-  height: 614px;
-  margin: 100px auto;
-  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 1000px;
+  padding: 40px 20px;
+  margin: 60px auto;
+  border-radius: 20px;
   border-top: 2px solid #664dff;
   background: radial-gradient(
     217.23% 100.08% at 50% 18.33%,
@@ -338,7 +348,10 @@ export default {
     #63e 69.34%,
     #fff 100%
   );
+  box-shadow: 0px 8px 40px rgba(102, 77, 255, 0.1);
 }
+
+
 
 .cta-content {
   display: flex;
@@ -363,7 +376,7 @@ export default {
 
 .cta-description {
   width: 656px;
-  color: #77798f;
+  color: #ececf1;
   text-align: center;
   font: 400 18px/160% ABeeZee;
 }
@@ -420,7 +433,7 @@ export default {
 
   .how-to-use {
     width: 90%;
-    padding: 50px;
+    padding: 60px;
     flex-direction: column;
     gap: 50px;
   }
