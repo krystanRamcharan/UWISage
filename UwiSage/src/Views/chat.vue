@@ -11,27 +11,39 @@
       </div>
 
       <div class="sidebar-content">
-        <button class="sidebar-option primary-option">
-          <span class="dot-icon primary-dot"></span>
-          <span>New Chat</span>
-        </button>
+<!--        <button class="sidebar-option primary-option" @click="startNewChat">-->
+<!--          <span class="dot-icon primary-dot"></span>-->
+<!--          <span>New Chat</span>-->
+<!--        </button>-->
 
-        <button class="sidebar-option">
+        <button class="sidebar-option" v-if="recentChats.length === 0">
           <span class="dot-icon"></span>
           <span>Recent Chats</span>
         </button>
 
-        <button class="sidebar-option">
-          <span>Create Study Schedule</span>
+        <!-- Render saved chats -->
+        <button
+            v-for="(chat, index) in recentChats"
+            :key="chat.id"
+            class="sidebar-option"
+            :class="{ 'active-chat': currentChatId === chat.id }"
+            @click="loadChat(chat.id)"
+        >
+          <span class="dot-icon"></span>
+          <span>{{ chat.title || `Chat ${index + 1}` }}</span>
         </button>
 
-        <button class="sidebar-option">
-          <span>Recommend Course</span>
-        </button>
+<!--        <button class="sidebar-option">-->
+<!--          <span>Create Study Schedule</span>-->
+<!--        </button>-->
 
-        <button class="sidebar-option">
-          <span>Explain Homework</span>
-        </button>
+<!--        <button class="sidebar-option">-->
+<!--          <span>Recommend Course</span>-->
+<!--        </button>-->
+
+<!--        <button class="sidebar-option">-->
+<!--          <span>Explain Homework</span>-->
+<!--        </button>-->
       </div>
 
       <div class="user-profile">
@@ -47,138 +59,117 @@
         </button>
       </div>
     </div>
-      <!-- Main chat area -->
-      <div class="main-content">
-        <div class="header">
-          <div class="header-actions">
-            <button class="alert-button">
-              <span class="alert-icon">▲</span>
-            </button>
-            <button class="trash-button">
-              <span class="trash-icon">🗑</span>
-            </button>
-            <div class="search-container">
-              <input type="text"
-                     placeholder="Search UWIlinC"
-                     class="search-input"
-                     v-model="searchQuery"
-                     @keyup.enter="performDocSearch" />
-              <span class="search-icon" @click="performDocSearch">🔍</span>
-            </div>
-          </div>
+    <!-- Main chat area -->
+    <div class="main-content">
+      <div class="header">
+        <div class="header-title" v-if="currentChat">
+          {{ currentChat.title || 'New Chat' }}
         </div>
-
-        <div class="messages-container" ref="messagesContainer">
-          <div v-for="(message, index) in messages" :key="index"
-               :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
-            <div class="message-content" v-if="!message.isSearchResults && !message.isSchedule">
-              {{ message.text }}
-            </div>
-
-<!--            &lt;!&ndash; Display search results &ndash;&gt;-->
-<!--            <div class="search-results" v-if="message.isSearchResults">-->
-<!--              <div class="results-header">-->
-<!--                <h3>Search Results for: "{{ message.query }}"</h3>-->
-<!--                <p>Found {{ message.results.count }} results</p>-->
-<!--              </div>-->
-<!--              <div class="result-item" v-for="(result, idx) in message.results.results" :key="idx">-->
-<!--                <div class="result-title">-->
-<!--                  <a :href="result.link" target="_blank">{{ result.title }}</a>-->
-<!--                </div>-->
-<!--                <div class="result-snippet">{{ result.snippet }}</div>-->
-<!--                <div class="result-meta">Score: {{ result.score }}</div>-->
-<!--              </div>-->
-<!--            </div>-->
-            <!-- Display search results -->
-            <div class="search-results" v-if="message.isSearchResults">
-              <div class="results-header">
-                <h3>Search Results for: "{{ message.query }}"</h3>
-                <p>Found {{ message.results.results.length }} results</p>
-              </div>
-
-              <table class="search-results-table">
-                <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Document</th>
-                  <th>Score</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(result, idx) in message.results.results" :key="idx" class="result-row">
-                  <td class="result-index">{{ idx + 1 }}</td>
-                  <td class="result-content">
-                    <a :href="extractLink(result.content)" target="_blank">
-                      {{ formatDocumentTitle(result.content, result.doc_id) }}
-                    </a>
-                    <div class="result-snippet">{{ extractSnippet(result.content) }}</div>
-                  </td>
-                  <td class="result-score">{{ result.score }}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <!-- Display schedule -->
-<!--            <div class="schedule-results" v-if="message.isSchedule">-->
-<!--              <div class="schedule-header">-->
-<!--                <h3>Your Study Schedule</h3>-->
-<!--              </div>-->
-<!--              <div class="schedule-item" v-for="(course, timeSlot) in message.schedule" :key="timeSlot">-->
-<!--                <div class="schedule-day-time">-->
-<!--                  {{ formatTimeSlot(timeSlot) }}-->
-<!--                </div>-->
-<!--                <div class="schedule-course">{{ course }}</div>-->
-<!--              </div>-->
-<!--            </div>-->
-            <!-- Display schedule as a table -->
-            <div class="schedule-results" v-if="message.isSchedule">
-              <div class="schedule-header">
-                <h3>Your Study Schedule</h3>
-              </div>
-
-              <table class="schedule-table">
-                <thead>
-                <tr>
-                  <th>Day</th>
-                  <th>Time</th>
-                  <th>Course</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(course, timeSlot) in message.schedule" :key="timeSlot" class="schedule-row">
-                  <td class="schedule-day">{{ timeSlot.split('_')[0] }}</td>
-                  <td class="schedule-time">{{ timeSlot.split('_')[1] }}</td>
-                  <td class="schedule-course">{{ course }}</td>
-                </tr>
-                </tbody>
-              </table>
-          </div>
-            </div>
-        </div>
-
-        <div class="input-container">
-          <input
-              type="text"
-              v-model="newMessage"
-              @keyup.enter="sendMessage"
-              placeholder="Type a new message here"
-              class="message-input"
-          />
-          <div class="input-actions">
-            <button class="action-button">
-              <span class="attach-icon">📎</span>
-            </button>
-            <button class="action-button">
-              <span class="emoji-icon">😊</span>
-            </button>
-            <button class="send-button" @click="sendMessage">
-              <span class="send-icon">▶</span>
-            </button>
+        <div class="header-actions">
+          <button class="alert-button">
+            <span class="alert-icon">▲</span>
+          </button>
+          <button class="trash-button" @click="clearCurrentChat">
+            <span class="trash-icon">🗑</span>
+          </button>
+          <div class="search-container">
+            <input type="text"
+                   placeholder="Search UWIlinC"
+                   class="search-input"
+                   v-model="searchQuery"
+                   @keyup.enter="performDocSearch" />
+            <span class="search-icon" @click="performDocSearch">🔍</span>
           </div>
         </div>
       </div>
+
+      <div class="messages-container" ref="messagesContainer">
+        <div v-for="(message, index) in messages" :key="index"
+             :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
+          <div class="message-content" v-if="!message.isSearchResults && !message.isSchedule">
+            {{ message.text }}
+          </div>
+
+          <!-- Display search results -->
+          <div class="search-results" v-if="message.isSearchResults">
+            <div class="results-header">
+              <h3>Search Results for: "{{ message.query }}"</h3>
+              <p>Found {{ message.results.results.length }} results</p>
+            </div>
+
+            <table class="search-results-table">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Document</th>
+                <th>Score</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(result, idx) in message.results.results" :key="idx" class="result-row">
+                <td class="result-index">{{ idx + 1 }}</td>
+                <td class="result-content">
+                  <a :href="extractLink(result.content)" target="_blank">
+                    {{ formatDocumentTitle(result.content, result.doc_id) }}
+                  </a>
+                  <div class="result-snippet">{{ extractSnippet(result.content) }}</div>
+                </td>
+                <td class="result-score">{{ result.score }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Display schedule as a table -->
+          <div class="schedule-results" v-if="message.isSchedule">
+            <div class="schedule-header">
+              <h3>Your Study Schedule</h3>
+            </div>
+
+            <table class="schedule-table">
+              <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Course</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(course, timeSlot) in message.schedule" :key="timeSlot" class="schedule-row">
+                <td class="schedule-day">{{ timeSlot.split('_')[0] }}</td>
+                <td class="schedule-time">{{ timeSlot.split('_')[1] }}</td>
+                <td class="schedule-course">{{ course }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <input
+            type="text"
+            v-model="newMessage"
+            @keyup.enter="sendMessage"
+            placeholder="Type a new message here"
+            class="message-input"
+        />
+        <div class="input-actions">
+          <button class="action-button">
+            <span class="attach-icon">📎</span>
+          </button>
+          <button class="action-button">
+            <span class="emoji-icon">😊</span>
+          </button>
+          <button class="send-button" @click="sendMessage">
+            <span class="send-icon">▶</span>
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
+
 <script>
 import axios from 'axios';
 
@@ -189,7 +180,14 @@ export default {
       newMessage: '',
       searchQuery: '',
       messages: [],
-      isLoading: false
+      isLoading: false,
+      expectingBusyTimes: false,
+      expectingConstraints: false,
+      busyText: '',
+      constraintsText: '',
+      recentChats: [],
+      currentChatId: null,
+      currentChat: null
     };
   },
   methods: {
@@ -220,6 +218,146 @@ export default {
       return parts.length > 1 ? parts[1] : '';
     },
 
+    generateChatId() {
+      return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    },
+
+    generateChatTitle(message) {
+      // Create a title from the first user message
+      if (!message) return 'New Chat';
+
+      // Limit title length
+      const maxLength = 30;
+      let title = message.trim();
+
+      if (title.length > maxLength) {
+        title = title.substring(0, maxLength) + '...';
+      }
+
+      return title;
+    },
+
+    startNewChat() {
+      // Save current chat if it exists
+      this.saveCurrentChat();
+
+      // Create a new chat
+      const chatId = this.generateChatId();
+      this.currentChatId = chatId;
+      this.messages = [];
+
+      // Add welcome message
+      this.messages.push({
+        text: 'Hello! I can help you search for documents or create a study schedule. Try typing "Search for [topic]" or "Create a study schedule".',
+        sender: 'bot'
+      });
+
+      // Create a new chat object
+      this.currentChat = {
+        id: chatId,
+        title: 'New Chat',
+        messages: [...this.messages],
+        createdAt: new Date().toISOString()
+      };
+
+      // Save to local storage
+      this.saveToLocalStorage();
+
+      // Update the list of recent chats
+      this.loadRecentChats();
+    },
+
+    saveCurrentChat() {
+      if (!this.currentChatId || this.messages.length <= 1) return;
+
+      // Find the first user message to use as title if needed
+      const firstUserMessage = this.messages.find(msg => msg.sender === 'user');
+
+      // Update the current chat object
+      if (this.currentChat) {
+        this.currentChat.messages = [...this.messages];
+
+        // Set title from first user message if not already set
+        if (!this.currentChat.title || this.currentChat.title === 'New Chat') {
+          this.currentChat.title = firstUserMessage
+              ? this.generateChatTitle(firstUserMessage.text)
+              : 'New Chat';
+        }
+
+        // Save to local storage
+        const allChats = JSON.parse(localStorage.getItem('uwilincChats') || '[]');
+        const existingChatIndex = allChats.findIndex(chat => chat.id === this.currentChatId);
+
+        if (existingChatIndex >= 0) {
+          allChats[existingChatIndex] = this.currentChat;
+        } else {
+          allChats.push(this.currentChat);
+        }
+
+        localStorage.setItem('uwilincChats', JSON.stringify(allChats));
+      }
+    },
+
+    loadChat(chatId) {
+      // Save current chat before switching
+      this.saveCurrentChat();
+
+      // Load the selected chat
+      const allChats = JSON.parse(localStorage.getItem('uwilincChats') || '[]');
+      const chatToLoad = allChats.find(chat => chat.id === chatId);
+
+      if (chatToLoad) {
+        this.currentChatId = chatId;
+        this.currentChat = chatToLoad;
+        this.messages = [...chatToLoad.messages];
+
+        // Scroll to bottom after loading
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      }
+    },
+
+    loadRecentChats() {
+      const allChats = JSON.parse(localStorage.getItem('uwilincChats') || '[]');
+
+      // Sort chats by most recent first
+      this.recentChats = allChats.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+    },
+
+    clearCurrentChat() {
+      if (!this.currentChatId) return;
+
+      // Ask for confirmation
+      if (confirm('Are you sure you want to delete this chat?')) {
+        // Remove from local storage
+        const allChats = JSON.parse(localStorage.getItem('uwilincChats') || '[]');
+        const updatedChats = allChats.filter(chat => chat.id !== this.currentChatId);
+        localStorage.setItem('uwilincChats', JSON.stringify(updatedChats));
+
+        // Start a new chat
+        this.startNewChat();
+      }
+    },
+
+    saveToLocalStorage() {
+      // Save all chats to local storage
+      if (!this.currentChat) return;
+
+      const allChats = JSON.parse(localStorage.getItem('uwilincChats') || '[]');
+      const existingChatIndex = allChats.findIndex(chat => chat.id === this.currentChatId);
+
+      if (existingChatIndex >= 0) {
+        allChats[existingChatIndex] = this.currentChat;
+      } else {
+        allChats.push(this.currentChat);
+      }
+
+      localStorage.setItem('uwilincChats', JSON.stringify(allChats));
+    },
+
     sendMessage() {
       if (this.newMessage.trim() === '') return;
 
@@ -232,8 +370,17 @@ export default {
       const userMessage = this.newMessage;
       this.newMessage = '';
 
+      // If this is the first user message, update the chat title
+      if (!this.currentChat.title || this.currentChat.title === 'New Chat') {
+        this.currentChat.title = this.generateChatTitle(userMessage);
+      }
+
       // Process the message to determine intent
       this.processUserMessage(userMessage);
+
+      // Save the chat after adding the message
+      this.currentChat.messages = [...this.messages];
+      this.saveToLocalStorage();
 
       // Scroll to bottom after new message
       this.$nextTick(() => {
@@ -303,6 +450,10 @@ export default {
         this.isLoading = false;
       }
 
+      // Save chat after updating messages
+      this.currentChat.messages = [...this.messages];
+      this.saveToLocalStorage();
+
       // Scroll to bottom after processing
       this.$nextTick(() => {
         this.scrollToBottom();
@@ -322,6 +473,10 @@ export default {
 
         // Clear the search input
         this.searchQuery = '';
+
+        // Save chat after search
+        this.currentChat.messages = [...this.messages];
+        this.saveToLocalStorage();
       }
     },
 
@@ -358,6 +513,10 @@ export default {
         });
       } finally {
         this.isLoading = false;
+
+        // Save chat after search results
+        this.currentChat.messages = [...this.messages];
+        this.saveToLocalStorage();
       }
     },
 
@@ -385,7 +544,7 @@ export default {
           schedule: response.data.schedule,
           sender: 'bot'
         });
-        console.log(this.messages)
+
         // Add a follow-up message
         this.messages.push({
           text: 'Here\'s your study schedule based on your availability and preferences. Let me know if you\'d like to make any adjustments!',
@@ -399,82 +558,36 @@ export default {
         });
       } finally {
         this.isLoading = false;
+
+        // Save chat after schedule generation
+        this.currentChat.messages = [...this.messages];
+        this.saveToLocalStorage();
       }
     },
 
     scrollToBottom() {
       const container = this.$refs.messagesContainer;
-      container.scrollTop = container.scrollHeight;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
     }
   },
   mounted() {
-    // Initialize with a welcome message
-    this.messages.push({
-      text: 'Hello! I can help you search for documents or create a study schedule. Try typing "Search for [topic]" or "Create a study schedule".',
-      sender: 'bot'
-    });
+    // Load recent chats from local storage
+    this.loadRecentChats();
+
+    // Check if we have any existing chats
+    if (this.recentChats.length > 0) {
+      // Load the most recent chat
+      this.loadChat(this.recentChats[0].id);
+    } else {
+      // Start a new chat if no existing chats
+      this.startNewChat();
+    }
   }
 };
 </script>
-<!--<script>-->
-<!--export default {-->
-<!--  name: 'ChatInterface',-->
-<!--  data() {-->
-<!--    return {-->
-<!--      newMessage: '',-->
-<!--      messages: [-->
-<!--        // Sample messages for demonstration-->
-<!--        // { text: 'Hello! How can I help you today?', sender: 'bot' },-->
-<!--        // { text: 'I need help with my homework', sender: 'user' },-->
-<!--      ]-->
-<!--    };-->
-<!--  },-->
-<!--  methods: {-->
-<!--    sendMessage() {-->
-<!--      if (this.newMessage.trim() === '') return;-->
 
-<!--      // Add user message-->
-<!--      this.messages.push({-->
-<!--        text: this.newMessage,-->
-<!--        sender: 'user'-->
-<!--      });-->
-
-<!--      const userMessage = this.newMessage;-->
-<!--      this.newMessage = '';-->
-
-<!--      // Simulate bot response (in a real app, this would be an API call)-->
-<!--      setTimeout(() => {-->
-<!--        this.receiveBotMessage(userMessage);-->
-<!--      }, 500);-->
-<!--    },-->
-<!--    receiveBotMessage(userMessage) {-->
-<!--      // In a real implementation, this would be replaced with an actual API call-->
-<!--      let botResponse = 'I received your message: "' + userMessage + '". How can I assist you further?';-->
-
-<!--      this.messages.push({-->
-<!--        text: botResponse,-->
-<!--        sender: 'bot'-->
-<!--      });-->
-
-<!--      // Scroll to bottom after new message-->
-<!--      this.$nextTick(() => {-->
-<!--        this.scrollToBottom();-->
-<!--      });-->
-<!--    },-->
-<!--    scrollToBottom() {-->
-<!--      const container = this.$refs.messagesContainer;-->
-<!--      container.scrollTop = container.scrollHeight;-->
-<!--    }-->
-<!--  },-->
-<!--  mounted() {-->
-<!--    // Initialize with a welcome message-->
-<!--    this.messages.push({-->
-<!--      text: 'Hello! How can I help you today?',-->
-<!--      sender: 'bot'-->
-<!--    });-->
-<!--  }-->
-<!--};-->
-<!--</script>-->
 
 <style scoped>
 .search-results-table {
@@ -602,6 +715,7 @@ body, html {
   flex-direction: column;
   gap: 1px;
   margin-top: 8px;
+  overflow-y: auto;
 }
 
 .sidebar-option {
@@ -638,6 +752,12 @@ body, html {
 
 .primary-option {
   background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.active-chat {
+  background-color: rgba(255, 255, 255, 0.15);
   color: #ffffff;
   font-weight: 500;
 }
@@ -706,6 +826,16 @@ body, html {
 .header {
   padding: 10px 15px;
   border-bottom: 1px solid #eaeaef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
 }
 
 .header-actions {
