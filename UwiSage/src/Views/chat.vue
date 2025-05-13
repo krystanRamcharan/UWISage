@@ -47,69 +47,179 @@
         </button>
       </div>
     </div>
+      <!-- Main chat area -->
+      <div class="main-content">
+        <div class="header">
+          <div class="header-actions">
+            <button class="alert-button">
+              <span class="alert-icon">▲</span>
+            </button>
+            <button class="trash-button">
+              <span class="trash-icon">🗑</span>
+            </button>
+            <div class="search-container">
+              <input type="text"
+                     placeholder="Search UWIlinC"
+                     class="search-input"
+                     v-model="searchQuery"
+                     @keyup.enter="performDocSearch" />
+              <span class="search-icon" @click="performDocSearch">🔍</span>
+            </div>
+          </div>
+        </div>
 
-    <!-- Main chat area -->
-    <div class="main-content">
-      <div class="header">
-        <div class="header-actions">
-          <button class="alert-button">
-            <span class="alert-icon">▲</span>
-          </button>
-          <button class="trash-button">
-            <span class="trash-icon">🗑</span>
-          </button>
-          <div class="search-container">
-            <input type="text" placeholder="Search" class="search-input" />
-            <span class="search-icon">🔍</span>
+        <div class="messages-container" ref="messagesContainer">
+          <div v-for="(message, index) in messages" :key="index"
+               :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
+            <div class="message-content" v-if="!message.isSearchResults && !message.isSchedule">
+              {{ message.text }}
+            </div>
+
+<!--            &lt;!&ndash; Display search results &ndash;&gt;-->
+<!--            <div class="search-results" v-if="message.isSearchResults">-->
+<!--              <div class="results-header">-->
+<!--                <h3>Search Results for: "{{ message.query }}"</h3>-->
+<!--                <p>Found {{ message.results.count }} results</p>-->
+<!--              </div>-->
+<!--              <div class="result-item" v-for="(result, idx) in message.results.results" :key="idx">-->
+<!--                <div class="result-title">-->
+<!--                  <a :href="result.link" target="_blank">{{ result.title }}</a>-->
+<!--                </div>-->
+<!--                <div class="result-snippet">{{ result.snippet }}</div>-->
+<!--                <div class="result-meta">Score: {{ result.score }}</div>-->
+<!--              </div>-->
+<!--            </div>-->
+            <!-- Display search results -->
+            <div class="search-results" v-if="message.isSearchResults">
+              <div class="results-header">
+                <h3>Search Results for: "{{ message.query }}"</h3>
+                <p>Found {{ message.results.results.length }} results</p>
+              </div>
+
+              <table class="search-results-table">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Document</th>
+                  <th>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(result, idx) in message.results.results" :key="idx" class="result-row">
+                  <td class="result-index">{{ idx + 1 }}</td>
+                  <td class="result-content">
+                    <a :href="extractLink(result.content)" target="_blank">
+                      {{ formatDocumentTitle(result.content, result.doc_id) }}
+                    </a>
+                    <div class="result-snippet">{{ extractSnippet(result.content) }}</div>
+                  </td>
+                  <td class="result-score">{{ result.score }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Display schedule -->
+<!--            <div class="schedule-results" v-if="message.isSchedule">-->
+<!--              <div class="schedule-header">-->
+<!--                <h3>Your Study Schedule</h3>-->
+<!--              </div>-->
+<!--              <div class="schedule-item" v-for="(course, timeSlot) in message.schedule" :key="timeSlot">-->
+<!--                <div class="schedule-day-time">-->
+<!--                  {{ formatTimeSlot(timeSlot) }}-->
+<!--                </div>-->
+<!--                <div class="schedule-course">{{ course }}</div>-->
+<!--              </div>-->
+<!--            </div>-->
+            <!-- Display schedule as a table -->
+            <div class="schedule-results" v-if="message.isSchedule">
+              <div class="schedule-header">
+                <h3>Your Study Schedule</h3>
+              </div>
+
+              <table class="schedule-table">
+                <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Time</th>
+                  <th>Course</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(course, timeSlot) in message.schedule" :key="timeSlot" class="schedule-row">
+                  <td class="schedule-day">{{ timeSlot.split('_')[0] }}</td>
+                  <td class="schedule-time">{{ timeSlot.split('_')[1] }}</td>
+                  <td class="schedule-course">{{ course }}</td>
+                </tr>
+                </tbody>
+              </table>
+          </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+          <input
+              type="text"
+              v-model="newMessage"
+              @keyup.enter="sendMessage"
+              placeholder="Type a new message here"
+              class="message-input"
+          />
+          <div class="input-actions">
+            <button class="action-button">
+              <span class="attach-icon">📎</span>
+            </button>
+            <button class="action-button">
+              <span class="emoji-icon">😊</span>
+            </button>
+            <button class="send-button" @click="sendMessage">
+              <span class="send-icon">▶</span>
+            </button>
           </div>
         </div>
       </div>
-
-      <div class="messages-container" ref="messagesContainer">
-        <div v-for="(message, index) in messages" :key="index"
-             :class="['message', message.sender === 'user' ? 'user-message' : 'bot-message']">
-          <div class="message-content">{{ message.text }}</div>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <input
-            type="text"
-            v-model="newMessage"
-            @keyup.enter="sendMessage"
-            placeholder="Type a new message here"
-            class="message-input"
-        />
-        <div class="input-actions">
-          <button class="action-button">
-            <span class="attach-icon">📎</span>
-          </button>
-          <button class="action-button">
-            <span class="emoji-icon">😊</span>
-          </button>
-          <button class="send-button" @click="sendMessage">
-            <span class="send-icon">▶</span>
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
-
 <script>
+import axios from 'axios';
+
 export default {
   name: 'ChatInterface',
   data() {
     return {
       newMessage: '',
-      messages: [
-        // Sample messages for demonstration
-        // { text: 'Hello! How can I help you today?', sender: 'bot' },
-        // { text: 'I need help with my homework', sender: 'user' },
-      ]
+      searchQuery: '',
+      messages: [],
+      isLoading: false
     };
   },
   methods: {
+    formatTimeSlot(timeSlot) {
+      // Split the timeSlot string (e.g., "Mon_12pm") into day and time
+      const [day, time] = timeSlot.split('_');
+      return `${day} at ${time}`;
+    },
+    extractLink(content) {
+      // Extract URL from content
+      const urlMatch = content.match(/(https?:\/\/[^\s]+)/);
+      return urlMatch ? urlMatch[0] : '#';
+    },
+
+    formatDocumentTitle(content, docId) {
+      // Extract filename from URL
+      const urlMatch = content.match(/\/([^\/]+\.pdf)/);
+      if (urlMatch) {
+        return urlMatch[1];
+      }
+      // Fallback to doc_id
+      return `Document ${docId}`;
+    },
+
+    extractSnippet(content) {
+      // Get content after the URL
+      const parts = content.split('...');
+      return parts.length > 1 ? parts[1] : '';
+    },
+
     sendMessage() {
       if (this.newMessage.trim() === '') return;
 
@@ -122,25 +232,176 @@ export default {
       const userMessage = this.newMessage;
       this.newMessage = '';
 
-      // Simulate bot response (in a real app, this would be an API call)
-      setTimeout(() => {
-        this.receiveBotMessage(userMessage);
-      }, 500);
-    },
-    receiveBotMessage(userMessage) {
-      // In a real implementation, this would be replaced with an actual API call
-      let botResponse = 'I received your message: "' + userMessage + '". How can I assist you further?';
-
-      this.messages.push({
-        text: botResponse,
-        sender: 'bot'
-      });
+      // Process the message to determine intent
+      this.processUserMessage(userMessage);
 
       // Scroll to bottom after new message
       this.$nextTick(() => {
         this.scrollToBottom();
       });
     },
+
+    async processUserMessage(message) {
+      this.isLoading = true;
+
+      // Check if it's a search query
+      if (message.toLowerCase().includes('search for') || message.toLowerCase().includes('find documents')) {
+        // Extract the search query from the message
+        let query = message;
+        if (message.toLowerCase().includes('search for')) {
+          query = message.substring(message.toLowerCase().indexOf('search for') + 11).trim();
+        } else if (message.toLowerCase().includes('find documents')) {
+          query = message.substring(message.toLowerCase().indexOf('find documents') + 14).trim();
+        }
+
+        // Perform the search
+        await this.docSearch(query);
+      }
+      // Check if it's a schedule request
+      else if (message.toLowerCase().includes('schedule') ||
+          message.toLowerCase().includes('study plan') ||
+          message.toLowerCase().includes('create schedule')) {
+        // For scheduling, we need busy times and constraints
+        // Let's ask the user for these inputs
+        this.messages.push({
+          text: "I can help create a study schedule. Please share your busy times in the format:\n\nMonday: 9:00-12:00, 15:00-17:00\nTuesday: 10:00-13:00\n...",
+          sender: 'bot'
+        });
+
+        // Store a flag to indicate that next message should be busy times
+        this.expectingBusyTimes = true;
+        this.isLoading = false;
+      }
+      // Check if we're expecting busy times
+      else if (this.expectingBusyTimes) {
+        // Store busy times and ask for constraints
+        this.busyText = message;
+        this.expectingBusyTimes = false;
+        this.expectingConstraints = true;
+
+        this.messages.push({
+          text: "Great! Now, please share any study constraints or preferences (e.g., 'I prefer to study Math in the morning', 'No Biology after 18:00').",
+          sender: 'bot'
+        });
+        this.isLoading = false;
+      }
+      // Check if we're expecting constraints
+      else if (this.expectingConstraints) {
+        // Store constraints and generate schedule
+        this.constraintsText = message;
+        this.expectingConstraints = false;
+
+        // Now we have both busy times and constraints, generate the schedule
+        await this.generateSchedule(this.busyText, this.constraintsText);
+      }
+      // Default response for other types of messages
+      else {
+        this.messages.push({
+          text: `I can help with document searches or creating study schedules. Try saying "Search for [topic]" or "Create a study schedule".`,
+          sender: 'bot'
+        });
+        this.isLoading = false;
+      }
+
+      // Scroll to bottom after processing
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
+
+    async performDocSearch() {
+      if (this.searchQuery.trim() !== '') {
+        // Add the search query as a user message
+        this.messages.push({
+          text: `Search for: ${this.searchQuery}`,
+          sender: 'user'
+        });
+
+        // Perform the search
+        await this.docSearch(this.searchQuery);
+
+        // Clear the search input
+        this.searchQuery = '';
+      }
+    },
+
+    async docSearch(query) {
+      try {
+        // Show loading message
+        const loadingMsgIndex = this.messages.length;
+        this.messages.push({
+          text: `Searching for "${query}"...`,
+          sender: 'bot'
+        });
+
+        // Make API request to the doc_search endpoint
+        const response = await axios.post('http://127.0.0.1:5000/api/search', {
+          query: query,
+          max_results: 10
+        });
+
+        // Remove loading message
+        this.messages.splice(loadingMsgIndex, 1);
+
+        // Add search results to messages
+        this.messages.push({
+          isSearchResults: true,
+          query: query,
+          results: response.data,
+          sender: 'bot'
+        });
+      } catch (error) {
+        console.error('Error during document search:', error);
+        this.messages.push({
+          text: `An error occurred while searching: ${error.message}`,
+          sender: 'bot'
+        });
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async generateSchedule(busyText, constraintsText) {
+      try {
+        // Show loading message
+        const loadingMsgIndex = this.messages.length;
+        this.messages.push({
+          text: 'Generating your study schedule...',
+          sender: 'bot'
+        });
+
+        // Make API request to the schedule endpoint
+        const response = await axios.post('http://127.0.0.1:5000/api/schedule', {
+          busyText: busyText,
+          constraintsText: constraintsText
+        });
+
+        // Remove loading message
+        this.messages.splice(loadingMsgIndex, 1);
+
+        // Add schedule results to messages
+        this.messages.push({
+          isSchedule: true,
+          schedule: response.data.schedule,
+          sender: 'bot'
+        });
+        console.log(this.messages)
+        // Add a follow-up message
+        this.messages.push({
+          text: 'Here\'s your study schedule based on your availability and preferences. Let me know if you\'d like to make any adjustments!',
+          sender: 'bot'
+        });
+      } catch (error) {
+        console.error('Error generating schedule:', error);
+        this.messages.push({
+          text: `An error occurred while creating your schedule: ${error.message}`,
+          sender: 'bot'
+        });
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     scrollToBottom() {
       const container = this.$refs.messagesContainer;
       container.scrollTop = container.scrollHeight;
@@ -149,14 +410,130 @@ export default {
   mounted() {
     // Initialize with a welcome message
     this.messages.push({
-      text: 'Hello! How can I help you today?',
+      text: 'Hello! I can help you search for documents or create a study schedule. Try typing "Search for [topic]" or "Create a study schedule".',
       sender: 'bot'
     });
   }
 };
 </script>
+<!--<script>-->
+<!--export default {-->
+<!--  name: 'ChatInterface',-->
+<!--  data() {-->
+<!--    return {-->
+<!--      newMessage: '',-->
+<!--      messages: [-->
+<!--        // Sample messages for demonstration-->
+<!--        // { text: 'Hello! How can I help you today?', sender: 'bot' },-->
+<!--        // { text: 'I need help with my homework', sender: 'user' },-->
+<!--      ]-->
+<!--    };-->
+<!--  },-->
+<!--  methods: {-->
+<!--    sendMessage() {-->
+<!--      if (this.newMessage.trim() === '') return;-->
+
+<!--      // Add user message-->
+<!--      this.messages.push({-->
+<!--        text: this.newMessage,-->
+<!--        sender: 'user'-->
+<!--      });-->
+
+<!--      const userMessage = this.newMessage;-->
+<!--      this.newMessage = '';-->
+
+<!--      // Simulate bot response (in a real app, this would be an API call)-->
+<!--      setTimeout(() => {-->
+<!--        this.receiveBotMessage(userMessage);-->
+<!--      }, 500);-->
+<!--    },-->
+<!--    receiveBotMessage(userMessage) {-->
+<!--      // In a real implementation, this would be replaced with an actual API call-->
+<!--      let botResponse = 'I received your message: "' + userMessage + '". How can I assist you further?';-->
+
+<!--      this.messages.push({-->
+<!--        text: botResponse,-->
+<!--        sender: 'bot'-->
+<!--      });-->
+
+<!--      // Scroll to bottom after new message-->
+<!--      this.$nextTick(() => {-->
+<!--        this.scrollToBottom();-->
+<!--      });-->
+<!--    },-->
+<!--    scrollToBottom() {-->
+<!--      const container = this.$refs.messagesContainer;-->
+<!--      container.scrollTop = container.scrollHeight;-->
+<!--    }-->
+<!--  },-->
+<!--  mounted() {-->
+<!--    // Initialize with a welcome message-->
+<!--    this.messages.push({-->
+<!--      text: 'Hello! How can I help you today?',-->
+<!--      sender: 'bot'-->
+<!--    });-->
+<!--  }-->
+<!--};-->
+<!--</script>-->
 
 <style scoped>
+.search-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.search-results-table th, .search-results-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.search-results-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.result-row:hover {
+  background-color: #f5f5f5;
+}
+
+.result-snippet {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 4px;
+}
+
+.result-index {
+  width: 40px;
+  text-align: center;
+}
+
+.result-score {
+  width: 80px;
+  text-align: center;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.schedule-table th, .schedule-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.schedule-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.schedule-row:hover {
+  background-color: #f5f5f5;
+}
 * {
   margin: 0;
   padding: 0;

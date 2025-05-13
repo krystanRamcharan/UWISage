@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@builder.io/sdk-vue": "^4.0.4",
+    "axios": "^1.9.0",
     "vue-router": "^4.5.0"
   }
 }
