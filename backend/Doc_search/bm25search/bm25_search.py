@@ -36,7 +36,7 @@ class BuildIndex:
                 n_qi = sum(1 for d in self.index if term in d)
                 if n_qi == 0:
                     continue
-                idf = max(0, (N - n_qi + 0.5) / (n_qi + 0.5))
+                idf = idf = math.log((N - n_qi + 0.5) / (n_qi + 0.5) + 1)
                 numerator = f * (self.k1 + 1)
                 denominator = f + self.k1 * (1 - self.b + self.b * doc_len / self.avg_doc_length)
                 score += idf * (numerator / denominator)
