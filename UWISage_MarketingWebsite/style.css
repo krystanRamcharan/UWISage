@@ -1,0 +1,267 @@
+/* Base Reset & Layout */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(95deg, #4467ff 13.23%, #7241ff 81.63%);
+  /* background: linear-gradient(135deg, #4d35e5, #DA70FF); */
+  /* background: linear-gradient(160deg, #542fda, #6b42f5); */
+  /* background: linear-gradient(180deg, #0a0a23, #1c1c40); */
+  color: #f0f0f0;
+  line-height: 1.6;
+}
+.container {
+  max-width: 960px;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.header-flex { display: flex; align-items: center; gap: 24px; justify-content: flex-start; padding-left: 2rem; }
+.logo svg { width: 203px; height: 40.63px; }
+
+/* Hero */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+.logo svg {
+  width: 203px;
+  height: 40.63px;
+}
+
+.hero {
+  background: rgba(10,10,35,0.8);
+  padding-top: 80px; /* space for logo */
+  padding-bottom: 40px;
+  text-align: center;
+  position: relative;
+
+}
+
+.hero-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  text-align: center;
+  font-size: 4rem;
+  color: #fff;
+  margin: 0rem 0;
+}
+
+.hero p {
+  font-size: 1.5rem;
+  margin: 0rem 0;
+}
+
+.btn-primary {
+  background: #ffffff;
+  color: #542fda;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  border-radius: 30px;
+  font-weight: bold;
+} 
+
+/* Sections */
+.section {
+  padding: 4rem 2rem;
+}
+.section h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.land1-image-wrapper {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.land1-image {
+  max-width: 35%;
+  padding: 1rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+.land2-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.land2-image {
+  max-width: 50%;
+  padding: 0.95rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+.land3-image-wrapper {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+}
+
+.land3-image {
+  max-width: 101%;
+  padding: 0.9rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+.benefits-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.chatbot-image-wrapper {
+  position: relative;
+  width: 300px;
+  height: auto;
+  flex-shrink: 0;
+}
+.chatbot-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  left: 300px;
+  border-radius: 12px;
+  position: relative;
+  z-index: 1;
+}
+.chatbot-color-overlay {
+  position: absolute;
+  top: 0;
+  left: 300px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(95deg, #5f54f8 3.23%, #7241ff 89.63%);
+  mix-blend-mode: color;
+  border-radius: 12px;
+  z-index: 2;
+}
+
+.benefits {
+  list-style: none;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  max-width: 500px;
+  z-index: 3;
+}
+.benefits li {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.benefits .icon {
+  font-size: 1.5rem;
+}
+
+.card-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.card {
+  background: #292959;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 300px;
+  transition: transform 0.3s;
+}
+.card:hover {
+  transform: translateY(-5px);
+}
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.step {
+  background: #372e85;
+  padding: 1rem;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.how-it-works-image-wrapper {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+}
+
+.how-it-works-image {
+  max-width: 100%;
+  padding: 1rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+.sign-up-image-wrapper {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.sign-up-image {
+  max-width: 40%;
+  padding: 1.2rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+.login-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-image {
+  max-width: 40%;
+  padding: 1.2rem;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* CTA Section */
+.cta {
+  background: rgba(10,10,35,0.8);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.btn-secondary {
+  background: #f0f0f0;
+  color: #291f6b;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  border-radius: 25px;
+  margin-top: 1rem;
+  display: inline-block;
+  font-weight: bold;
+}
+
+/* Footer */
+footer {
+  background: rgba(10,10,35,0.8);
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  /* color: #999; */
+}
